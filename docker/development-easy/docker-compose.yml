@@ -18,6 +18,7 @@ services:
     image: openemr/openemr:flex
     ports:
     - 8300:80
+    - 8400:80
     - 9300:443
     volumes:
     - ../..:/openemr:ro
@@ -42,7 +43,7 @@ services:
       EASY_DEV_MODE: "yes"
       EASY_DEV_MODE_NEW: "yes"
       DEVELOPER_TOOLS: "yes"
-      XDEBUG_IDE_KEY: PHPSTORM
+      XDEBUG_IDE_KEY: VSCODE
       XDEBUG_PROFILER_ON: 1
       GITHUB_COMPOSER_TOKEN: c313de1ed5a00eb6ff9309559ec9ad01fcc553f0
       OPENEMR_DOCKER_ENV_TAG: easy-dev-docker
