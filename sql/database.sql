@@ -108,12 +108,11 @@ CREATE TABLE `api_log` (
 DROP TABLE IF EXISTS `api_token`;
 CREATE TABLE `api_token` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `token_api` varchar(4),
-  `user_id` bigint(20) NOT NULL,
-  `patient_id` bigint(20) NOT NULL,
-  `token` varchar(40) DEFAULT NULL,
-  `token_auth` varchar(255),
-  `expiry` datetime NULL,
+  `user_id` varchar(40) DEFAULT NULL,
+  `token` varchar(128) DEFAULT NULL,
+  `expiry` datetime DEFAULT NULL,
+  `client_id` varchar(80) DEFAULT NULL,
+  `scope` text COMMENT 'json encoded',
   PRIMARY KEY (`id`),
   UNIQUE KEY `token` (`token`)
 ) ENGINE = InnoDB;
@@ -1066,8 +1065,8 @@ CREATE TABLE `clinical_rules_log` (
 DROP TABLE IF EXISTS `codes`;
 CREATE TABLE `codes` (
   `id` int(11) NOT NULL auto_increment,
-  `code_text` varchar(255) NOT NULL default '',
-  `code_text_short` varchar(255) NOT NULL default '',
+  `code_text` text,
+  `code_text_short` text,
   `code` varchar(25) NOT NULL default '',
   `code_type` smallint(6) default NULL,
   `modifier` varchar(12) NOT NULL default '',
@@ -2789,7 +2788,7 @@ CREATE TABLE `icd10_dx_order_code` (
   `formatted_dx_code`   varchar(10),
   `valid_for_coding`    char,
   `short_desc`          varchar(60),
-  `long_desc`           varchar(300),
+  `long_desc`           text,
   `active` tinyint default 0,
   `revision` int default 0,
   KEY `formatted_dx_code` (`formatted_dx_code`),
@@ -2808,7 +2807,7 @@ CREATE TABLE `icd10_pcs_order_code` (
   `pcs_code`            varchar(7),
   `valid_for_coding`    char,
   `short_desc`          varchar(60),
-  `long_desc`           varchar(300),
+  `long_desc`           text,
   `active` tinyint default 0,
   `revision` int default 0,
   KEY `pcs_code` (`pcs_code`),
@@ -11384,8 +11383,8 @@ CREATE TABLE `codes_history` (
   `financial_reporting` tinyint(1),
   `category` varchar(255),
   `code_type_name` varchar(255),
-  `code_text` varchar(255),
-  `code_text_short` varchar(24),
+  `code_text` text,
+  `code_text_short` text,
   `prices` text,
   `action_type` varchar(25),
   `update_by` varchar(255),
@@ -12241,4 +12240,39 @@ CREATE TABLE `benefit_eligibility` (
     `response_status` enum('A','D') DEFAULT 'A',
     `response_create_date` date DEFAULT NULL,
     `response_modify_date` date DEFAULT NULL
+) ENGINE=InnoDB;
+
+DROP TABLE IF EXISTS `oauth_clients`;
+CREATE TABLE `oauth_clients` (
+`client_id` varchar(80) NOT NULL,
+`client_role` varchar(20) DEFAULT NULL,
+`client_name` varchar(80) NOT NULL,
+`client_secret` text,
+`registration_token` varchar(80) DEFAULT NULL,
+`registration_uri_path` varchar(40) DEFAULT NULL,
+`register_date` datetime DEFAULT NULL,
+`revoke_date` datetime DEFAULT NULL,
+`contacts` text,
+`redirect_uri` text,
+`grant_types` varchar(80) DEFAULT NULL,
+`scope` text,
+`user_id` varchar(40) DEFAULT NULL,
+`site_id` varchar(64) DEFAULT NULL,
+`is_confidential` tinyint(1) NOT NULL DEFAULT '1',
+PRIMARY KEY (`client_id`)
+) ENGINE=InnoDB;
+
+DROP TABLE IF EXISTS `oauth_trusted_user`;
+CREATE TABLE `oauth_trusted_user` (
+`id` bigint(20) NOT NULL AUTO_INCREMENT,
+`user_id` varchar(80) DEFAULT NULL,
+`client_id` varchar(80) DEFAULT NULL,
+`scope` text,
+`persist_login` tinyint(1) DEFAULT '0',
+`time` timestamp NULL DEFAULT NULL,
+`code` text,
+`session_cache` text,
+PRIMARY KEY (`id`),
+KEY `accounts_id` (`user_id`),
+KEY `clients_id` (`client_id`)
 ) ENGINE=InnoDB;

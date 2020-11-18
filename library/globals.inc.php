@@ -3079,6 +3079,13 @@ $GLOBALS_METADATA = array(
     //
     'Connectors' => array(
 
+        'site_addr_oath' => array(
+            xl('Site Address (required for oauth2 and fhir)'),
+            'text',
+            '',
+            xl('Site Address (required for oauth2 and fhir). Example is') . ' https://localhost:8300 .'
+        ),
+
         'rest_api' => array(
             xl('Enable OpenEMR Standard REST API'),
             'bool',
@@ -3105,6 +3112,18 @@ $GLOBALS_METADATA = array(
             'bool',
             '0',
             xl('Enable OpenEMR Patient Portal FHIR RESTful API.')
+        ),
+
+        'oauth_password_grant' => array(
+            xl('Enable Oauth2 Password Grant (Not considered secure)'),
+            array(
+                0 => xl('Off (Recommended setting)'),
+                1 => xl('On for Users Role'),
+                2 => xl('On for Patient Role'),
+                3 => xl('On for Both Roles')
+            ),
+            '0',
+            xl('Enable Oauth2 Password Grant. Recommend turning this setting off for production server. Recommend only using for testing.')
         ),
 
         'fhir_enable' => array(

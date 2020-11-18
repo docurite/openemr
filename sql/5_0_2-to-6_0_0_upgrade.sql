@@ -461,8 +461,8 @@ INSERT INTO `list_options` (`list_id`, `option_id`, `title`, `seq`, `is_default`
 ALTER TABLE `form_eye_mag_prefs` MODIFY `ordering` smallint(6) DEFAULT NULL;
 #EndIf
 
-#IfNotColumnType codes code_text_short varchar(255)
-ALTER TABLE `codes` MODIFY `code_text_short` varchar(255) NOT NULL default '';
+#IfNotColumnType codes code_text_short text
+ALTER TABLE `codes` MODIFY `code_text_short` text;
 #EndIf
 
 #IfNotColumnTypeDefault amendments created_time timestamp NULL
@@ -2264,4 +2264,138 @@ ALTER TABLE `documents` ADD `deleted` tinyint(1) NOT NULL DEFAULT '0';
 
 #IfMissingColumn procedure_providers active
 ALTER TABLE `procedure_providers` ADD `active` tinyint(1) NOT NULL DEFAULT '1';
+#EndIf
+
+#IfNotColumnType api_token token varchar(128)
+ALTER TABLE `api_token` CHANGE `token` `token` VARCHAR(128) DEFAULT NULL;
+#EndIf
+
+#IfNotColumnType api_token token_auth text
+ALTER TABLE `api_token` CHANGE `token_auth` `token_auth` TEXT;
+#EndIf
+
+#IfNotColumnType api_token user_id varchar(40)
+ALTER TABLE `api_token` CHANGE `user_id` `user_id` VARCHAR(40) DEFAULT NULL;
+#EndIf
+
+#IfMissingColumn api_token client_id
+ALTER TABLE `api_token` ADD `client_id` VARCHAR(80) DEFAULT NULL;
+#EndIf
+
+#IfMissingColumn api_token auth_user_id
+ALTER TABLE `api_token` ADD `auth_user_id` VARCHAR(80) DEFAULT NULL;
+#EndIf
+
+#IfMissingColumn api_token scope
+ALTER TABLE `api_token` ADD `scope` TEXT COMMENT 'json encoded';
+#EndIf
+
+#IfNotTable oauth_clients
+CREATE TABLE `oauth_clients` (
+`client_id` varchar(80) NOT NULL,
+`client_role` varchar(20) DEFAULT NULL,
+`client_name` varchar(80) NOT NULL,
+`client_secret` text,
+`registration_token` varchar(80) DEFAULT NULL,
+`registration_uri_path` varchar(40) DEFAULT NULL,
+`register_date` datetime DEFAULT NULL,
+`revoke_date` datetime DEFAULT NULL,
+`contacts` text,
+`redirect_uri` text,
+`grant_types` varchar(80) DEFAULT NULL,
+`scope` text,
+`user_id` varchar(40) DEFAULT NULL,
+`site_id` varchar(64) DEFAULT NULL,
+`is_confidential` tinyint(1) NOT NULL DEFAULT '1',
+PRIMARY KEY (`client_id`)
+) ENGINE=InnoDB;
+#EndIf
+
+#IfNotTable oauth_trusted_user
+CREATE TABLE `oauth_trusted_user` (
+`id` bigint(20) NOT NULL AUTO_INCREMENT,
+`user_id` varchar(80) DEFAULT NULL,
+`client_id` varchar(80) DEFAULT NULL,
+`scope` text,
+`persist_login` tinyint(1) DEFAULT '0',
+`time` timestamp NULL DEFAULT NULL,
+PRIMARY KEY (`id`),
+KEY `accounts_id` (`user_id`),
+KEY `clients_id` (`client_id`)
+) ENGINE=InnoDB;
+#EndIf
+
+#IfNotRow2D icd10_dx_order_code dx_code U072 active 1
+INSERT INTO `icd10_dx_order_code`
+(`dx_code`, `formatted_dx_code`, `valid_for_coding`, `short_desc`, `long_desc`, `active`, `revision`)
+VALUES ('U072', 'U07.2', '1', 'COVID-19, virus not identified', 'COVID-19, virus not identified', '1', '1');
+#EndIf
+
+#IfRow2D icd10_dx_order_code dx_code U072 active 1
+set @newMax = (SELECT MAX(revision) from icd10_dx_order_code);
+UPDATE `icd10_dx_order_code` SET `revision` = @newMax WHERE `dx_code` = 'U072';
+#EndIf
+
+#IfNotColumnType oauth_clients client_id varchar(80)
+ALTER TABLE `oauth_clients` CHANGE `client_id` `client_id` varchar(80) NOT NULL;
+#EndIf
+
+#IfNotColumnType oauth_clients client_secret text
+ALTER TABLE `oauth_clients` CHANGE `client_secret` `client_secret` text;
+#EndIf
+
+#IfNotColumnType oauth_clients registration_token varchar(80)
+ALTER TABLE `oauth_clients` CHANGE `registration_token` `registration_token` varchar(80) DEFAULT NULL;
+#EndIf
+
+#IfColumn api_token token_auth
+ALTER TABLE `api_token` DROP COLUMN `token_auth`;
+#EndIf
+
+#IfColumn api_token token_api
+ALTER TABLE `api_token` DROP COLUMN `token_api`;
+#EndIf
+
+#IfColumn api_token patient_id
+ALTER TABLE `api_token` DROP COLUMN `patient_id`;
+#EndIf
+
+#IfColumn api_token auth_user_id
+ALTER TABLE `api_token` DROP COLUMN `auth_user_id`;
+#EndIf
+
+#IfMissingColumn oauth_trusted_user code
+ALTER TABLE `oauth_trusted_user` ADD `code` text;
+#EndIf
+
+#IfMissingColumn oauth_trusted_user session_cache
+ALTER TABLE `oauth_trusted_user` ADD `session_cache` text;
+#EndIf
+
+#IfNotColumnType codes code_text text
+ALTER TABLE `codes` MODIFY `code_text` text;
+#EndIf
+
+#IfNotColumnType codes_history code_text text
+ALTER TABLE `codes_history` MODIFY `code_text` text;
+#EndIf
+
+#IfNotColumnType codes_history code_text_short text
+ALTER TABLE `codes_history` MODIFY `code_text_short` text;
+#EndIf
+
+#IfNotColumnType icd10_dx_order_code long_desc text
+ALTER TABLE `icd10_dx_order_code` MODIFY `long_desc` text;
+#EndIf
+
+#IfNotColumnType icd10_pcs_order_code long_desc text
+ALTER TABLE `icd10_pcs_order_code` MODIFY `long_desc` text;
+#EndIf
+
+#IfColumn api_token user_role
+ALTER TABLE `api_token` DROP COLUMN `user_role`;
+#EndIf
+
+#IfColumn oauth_trusted_user user_role
+ALTER TABLE `oauth_trusted_user` DROP COLUMN `user_role`;
 #EndIf

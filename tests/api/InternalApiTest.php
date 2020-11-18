@@ -15,7 +15,7 @@
 exit;
 
 
-require_once(dirname(__FILE__) . "/../../interface/globals.php");
+require_once(__DIR__ . "/../../interface/globals.php");
 
 use OpenEMR\Common\Csrf\CsrfUtils;
 use OpenEMR\Core\Header;
@@ -89,7 +89,7 @@ echo "<br /><br />";
 //  is limited to get requests at this time.
 use OpenEMR\Common\Http\HttpRestRouteHandler;
 
-require_once(dirname(__FILE__) . "/../../_rest_config.php");
+require_once(__DIR__ . "/../../_rest_config.php");
 $gbl = RestConfig::GetInstance();
 $gbl::setNotRestCall();
 // below will return as json
@@ -106,7 +106,7 @@ echo "<br /><br />";
 use OpenEMR\Services\FacilityService;
 
 echo "<b>service call:</b><br />";
-echo json_encode((new FacilityService())->getAll());
+echo json_encode((new FacilityService())->getAllFacility());
 echo "<br /><br />";
 
 
